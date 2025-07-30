@@ -1,0 +1,35 @@
+name: 'DEMO: 2. Create MSI Installer'
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'The release tag to download artifacts from (e.g., v1.0.0-demo)'
+        required: true
+        type: string
+
+jobs:
+  build_installer:
+    runs-on: windows-2022
+    steps:
+      - name: 'Download signed binaries from GitHub Release'
+        run: gh release download ${{ github.event.inputs.release_tag }} --pattern "signed-*.zip" --dir .
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 'Unzip downloaded artifacts'
+        run: |
+          unzip *.zip
+          echo "Unzipped contents:"
+          ls -lR
+
+      - name: 'Create a fake MSI file in correct path'
+        run: |
+          mkdir -p Sources/GUI/WindowsInstaller/Release
+          echo "This is a fake MSI installer." > "Sources/GUI/WindowsInstaller/Release/DisplayControlSoftware for ZRCT-300.msi"
+
+      - name: 'Upload MSI Installer as artifact'
+        uses: actions/upload-artifact@v4
+        with:
+          name: msi-installer
+          path: "Sources/GUI/WindowsInstaller/Release/DisplayControlSoftware for ZRCT-300.msi"
