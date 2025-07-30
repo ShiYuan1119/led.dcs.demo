@@ -1,0 +1,31 @@
+name: 'DEMO: 1. Build Fake Artifacts'
+
+on:
+  push:
+   branches:
+     - 'release/*'
+  workflow_dispatch:
+
+
+jobs:
+  build:
+    runs-on: windows-2022
+    steps:
+      - name: 'Checkout code'
+        uses: actions/checkout@v4
+
+      - name: 'Create fake build artifacts in correct paths'
+        run: |
+          mkdir -p Sources/GUI/DisplayControlSoftwareGUI/bin/Release
+          echo "This is a fake executable file" > Sources/GUI/DisplayControlSoftwareGUI/bin/Release/DisplayControlSoftwareGUI.exe
+          echo "This is a fake library file" > Sources/GUI/DisplayControlSoftwareGUI/bin/Release/SomeLibrary.dll
+          echo "This is a fake schema file" > Sources/GUI/DisplayControlSoftwareGUI/bin/Release/SomeData.xsd
+          echo "Build Log..." > Rebuild.log
+
+      - name: 'Upload All Unsigned Artifacts'
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-build-output-vs2019
+          path: |
+            Sources/GUI/DisplayControlSoftwareGUI/bin/Release/
+            Rebuild.log
