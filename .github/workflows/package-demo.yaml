@@ -29,11 +29,12 @@ jobs:
         id: package_info
         shell: pwsh
         run: |
-          $msi_file = "DisplayControlSoftware for ZRCT-300.msi"
+          $msi_file = Get-ChildItem -Filter *.msi | Select-Object -ExpandProperty FullName
           $version_txt = "Sources/GUI/Installer/bin/Version.txt"
           $zip_name = "DCS_Setup_${{ github.event.inputs.release_tag }}.zip"
           Compress-Archive -Path $msi_file, $version_txt -DestinationPath $zip_name -Force
           "zip_name=$zip_name" >> $env:GITHUB_OUTPUT
+
       
       - name: 'Upload final ZIP package'
         uses: actions/upload-artifact@v4
