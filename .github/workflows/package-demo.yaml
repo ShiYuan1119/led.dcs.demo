@@ -12,6 +12,9 @@ jobs:
   package_zip:
     runs-on: windows-2022
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
       - name: 'Download signed file from GitHub Release'
         run: gh release download ${{ github.event.inputs.release_tag }} --pattern "*.msi" --dir .
         env:
