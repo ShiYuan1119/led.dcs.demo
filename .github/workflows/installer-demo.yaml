@@ -21,10 +21,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 'Unzip downloaded artifacts'
+        shell: pwsh
         run: |
           unzip *.zip
-          echo "Unzipped contents:"
-          ls -lR
+          Write-Host "Unzipped contents:"
+          Get-ChildItem -Recurse
 
       - name: 'Create a fake MSI file in correct path'
         run: |
