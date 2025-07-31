@@ -12,16 +12,20 @@ jobs:
   build_installer:
     runs-on: windows-2022
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
       - name: 'Download signed binaries from GitHub Release'
         run: gh release download ${{ github.event.inputs.release_tag }} --pattern "signed-*.zip" --dir .
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 'Unzip downloaded artifacts'
+        shell: pwsh
         run: |
           unzip *.zip
-          echo "Unzipped contents:"
-          ls -lR
+          Write-Host "Unzipped contents:"
+          Get-ChildItem -Recurse
 
       - name: 'Create a fake MSI file in correct path'
         run: |
