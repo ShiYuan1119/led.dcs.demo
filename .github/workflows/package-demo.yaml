@@ -12,6 +12,9 @@ jobs:
   package_zip:
     runs-on: windows-2022
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
       - name: 'Download signed file from GitHub Release'
         run: gh release download ${{ github.event.inputs.release_tag }} --pattern "*.msi" --dir .
         env:
@@ -24,12 +27,14 @@ jobs:
 
       - name: 'Create and name final ZIP package'
         id: package_info
+        shell: pwsh
         run: |
-          msi_file="DisplayControlSoftware for ZRCT-300.msi"
-          zip_name="DCS_Setup_${{ github.event.inputs.release_tag }}.zip"
-          # -j flag removes directory paths from the zip archive, matching the original behavior
-          zip -j "$zip_name" "$msi_file" "Sources/GUI/Installer/bin/Version.txt"
-          echo "zip_name=$zip_name" >> $GITHUB_OUTPUT
+          $msi_file = Get-ChildItem -Filter *.msi | Select-Object -ExpandProperty FullName
+          $version_txt = "Sources/GUI/Installer/bin/Version.txt"
+          $zip_name = "DCS_Setup_${{ github.event.inputs.release_tag }}.zip"
+          Compress-Archive -Path $msi_file, $version_txt -DestinationPath $zip_name -Force
+          "zip_name=$zip_name" >> $env:GITHUB_OUTPUT
+
       
       - name: 'Upload final ZIP package'
         uses: actions/upload-artifact@v4
